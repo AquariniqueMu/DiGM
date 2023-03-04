@@ -2,7 +2,7 @@
 Description: 一些经典baseline算法的代码合集
 Author: Junwen Yang
 Date: 2022-10-13 09:42:40
-LastEditTime: 2023-02-04 11:16:13
+LastEditTime: 2023-03-04 20:02:31
 LastEditors: Junwen Yang
 '''
 import numpy as np
@@ -371,8 +371,38 @@ def weighted_PageRank(G, alpha=0.85,theta=0.8, personalization=None, max_iter=10
                         'in %d iterations.' % max_iter)
 
 
-def LGC(G:nx.DiGraph):
+def LGC(G:nx.Graph):
+    """
+    计算Laplacian重力中心性: 以度值组合取代之前的Laplace质量
     
+    """
+    # 获取节点的度值
+    DEGREE = G.degree()
+    # KSHELL = ks.kshell(G)
+    # KS_POLAR_DIFF = max(KSHELL.values()) - min(KSHELL.values())
+    MASS_LC = dict.fromkeys(G.nodes(), 0)
+    for node in G.nodes():
+        MASS_LC[node] = DEGREE[node] + DEGREE[node] ** 2
+        for neighbor in G.neighbors(node):
+            MASS_LC[node] += DEGREE[neighbor] * 2
+    
+    # 计算网络的平均路径长度, 取一半并四舍五入, 为截断半径
+    AVER_DIST = tf.AVERAGE_DISTANCE(G)
+    INT_AVER_DIST = int(AVER_DIST / 2 + 0.5)
+
+    # 搜索所有节点的 [AVER_DIST四舍五入] 阶邻居
+    DICT_NEIGHBOR = dict()
+    for node in G.nodes():
+        DICT_NEIGHBOR[node] = tf.neighbor_search(G, node, INT_AVER_DIST)
+
+    # 计算中心性分数
+    CENTRALITY = dict.fromkeys(G.nodes(), 0)
+    for node in G.nodes():
+        for i in range(INT_AVER_DIST):
+            CENTRALITY[node] += sum(
+                [MASS_LC[target] * MASS_LC[node] / (i+1)**2 for target in DICT_NEIGHBOR[node][i]])
+
+    return CENTRALITY
 
 
 
@@ -381,9 +411,12 @@ def LGC(G:nx.DiGraph):
 
 
 def test():
-    G = nx.DiGraph()
-    G = nx.read_weighted_edgelist('stormofswords.edgelist',create_using=nx.DiGraph(),nodetype=int)
+    G = nx.Graph()
+    G = nx.read_weighted_edgelist('./data/stormofswords.edgelist',create_using=nx.DiGraph(),nodetype=int)
     # print(EffG(G,'stormofswords.edgelist'))
-    print(sorted(EffG(G).items(), key=lambda x: x[1], reverse=True))    # 在这里调用函数
-# test()
+    res = LGC(G)
+    
+    res_sort = sorted(res.items(), key=lambda x: x[1], reverse=True)
+    print(res_sort)
+test()
 
