@@ -219,26 +219,6 @@ def EffG(G):
 
 
 
-    # ADJ_MAT[ADJ_MAT==0]=math.inf
-    # SHORTEST_LENGTH_MAT = np.array((ADJ_MAT).todense())
-    # with alive_bar(nx.number_of_nodes(G)**1) as bar:
-    #     for k in G.nodes():
-    #         for i in G.nodes():
-    #             for j in G.nodes():
-    #                 if SHORTEST_LENGTH_MAT[i][j] > SHORTEST_LENGTH_MAT[i][k] + SHORTEST_LENGTH_MAT[k][j]:
-    #                     SHORTEST_LENGTH_MAT[i][j] = SHORTEST_LENGTH_MAT[i][k] + SHORTEST_LENGTH_MAT[k][j]
-    #         bar()     
-
-    # print(SHORTEST_LENGTH_MAT[1,:])
-
-    # CENTRALITY = dict.fromkeys(G.nodes(), 0)
-    # for node in G.nodes():
-    #     REACH_NODES = np.where(SHORTEST_LENGTH_MAT[node]!=math.inf)[0]
-    #     # print(REACH_NODES)
-    #     for target in REACH_NODES:
-    #         CENTRALITY[node] += MASS[node] * MASS[target] / SHORTEST_LENGTH_MAT[node][target]**2
-    # np.savetxt('./'+edgelist_name+'/'+edgelist_name+'最短有效距离矩阵.txt', SHORTEST_LENGTH_MAT, fmt='%f',delimiter='\t')
-
     return CENTRALITY
     
     
@@ -391,7 +371,8 @@ def weighted_PageRank(G, alpha=0.85,theta=0.8, personalization=None, max_iter=10
                         'in %d iterations.' % max_iter)
 
 
-
+def LGC(G:nx.DiGraph):
+    
 
 
 
