@@ -2,7 +2,7 @@
 Description: 用于生成SIR模型的标准中心性序列
 Author: Junwen Yang
 Date: 2023-03-04 20:39:27
-LastEditTime: 2023-03-05 13:05:20
+LastEditTime: 2023-03-05 14:29:45
 LastEditors: Junwen Yang
 '''
 import networkx as nx
@@ -88,16 +88,16 @@ def SIR_average(G, infected_nodes, beta, gamma, max_time, num_simulations):
 undirected_network_list = [
     'MesselShale_foodweb',
     'bitcoinalpha'
-    # 'moreno_health',
-    # 'Wiki-Vote',
-    # 'twitterreferendum'
+    'moreno_health',
+    'Wiki-Vote',
+    'twitterreferendum'
     ]
 
 
 beta_ = 0.2
 gamma_ = 0.2
 max_time_ = 400
-num_simulations_ = 1
+num_simulations_ = 20
 
 now = datetime.datetime.now()
 date_string = now.strftime('%m-%d_%H-%M')
@@ -106,15 +106,21 @@ filename = 'standard_series_'+date_string+'.xlsx'
 empty_df = pd.DataFrame()
 empty_df.to_excel(filepath+filename)
 
+
+
+# with alive_bar(len(undirected_network_list), title="Outer Loop") as outer_bar:
 for net in undirected_network_list:
+    
+    print("==========================Processing network: ", net+"==========================")
+    
     G = nx.read_weighted_edgelist('./data/'+net+'.edgelist', nodetype=int)
 
     res = dict()
-    with alive_bar(G.number_of_nodes()) as bar:
+    with alive_bar(G.number_of_nodes(), title="Current Network Simulation",bar='blocks') as inner_bar:
         for node in G.nodes():
             res_dict = SIR_average(G, infected_nodes=[node], beta = beta_, gamma = gamma_, max_time = max_time_, num_simulations = num_simulations_)
             res[node] = (res_dict['I'] + res_dict['R']) / G.number_of_nodes()
-            bar()
+            inner_bar()  
     # Convert res dictionary to dataframe
     df_res = pd.DataFrame.from_dict(res, orient='index', columns=['Infection Ratio'])
 
@@ -122,6 +128,8 @@ for net in undirected_network_list:
     with pd.ExcelWriter(filepath+filename, mode='a', engine="openpyxl") as writer:
         df_res.to_excel(writer, sheet_name=net)
 
-    res = dict(sorted(res.items(), key=lambda x: x[1], reverse=True))
-    print(res)
+        
+
+
+        
 
