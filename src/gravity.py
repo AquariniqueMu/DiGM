@@ -2,7 +2,7 @@
 Description: 
 Author: Junwen Yang
 Date: 2022-07-12 09:39:17
-LastEditTime: 2023-02-09 21:14:55
+LastEditTime: 2023-03-05 11:52:50
 LastEditors: Junwen Yang
 '''
 
@@ -13,16 +13,16 @@ import pandas as pd
 import kshell as ks
 # import localdim as ld
 import tools_func as tf
-import ismf
-import klayer as kl
+# import ismf
+# import klayer as kl
 from alive_progress import alive_bar
 class gravity_model():
     
-    def __init__(self, A, G, graph, switch_mass,switch_co,switch_dist):
-        self.A = A
+    def __init__(self, A, G,switch_mass,switch_co,switch_dist):
+        self.A = np.array(nx.adjacency_matrix(G).todense())
         self.G = G
         # self.W = W
-        self.graph = graph
+        # self.graph = graph
         self.size = len(A)
         # self.mass = dict()
         self.centrality = dict()
@@ -79,10 +79,7 @@ class gravity_model():
             self.mass_target = np.multiply(in_entropy,in_degree)
             
             
-        elif switch == 'klayer':
-            self.mass_source = kl.k_layer(self.G)
-            G_copy = self.G.copy()
-            self.mass_target = kl.k_layer(G_copy.reverse())
+
 
         elif switch == 'reatimesdegree':
             
@@ -190,22 +187,17 @@ class gravity_model():
                 if(k % 100 == 0):
                     print("Floyd process: %d"%k)
             print(self.dist)
-            np.savetxt('./'+self.graph+'/'+self.graph+'最短距离矩阵.txt', self.dist, fmt='%f',delimiter='\t')
+            # np.savetxt('./'+self.graph+'/'+self.graph+'最短距离矩阵.txt', self.dist, fmt='%f',delimiter='\t')
             
-        elif switch_dist == 'txt':
-            self.dist = np.loadtxt('./'+self.graph+'/'+self.graph+'最短距离矩阵.txt',dtype=float,delimiter='\t')
+        # elif switch_dist == 'txt':
+        #     self.dist = np.loadtxt('./'+self.graph+'/'+self.graph+'最短距离矩阵.txt',dtype=float,delimiter='\t')
         
     def coefficient_func(self,switch_co):
         if switch_co == 'local_dim':
             1
             # self.coefficient = [a+1 for a in ld.run_local_dim(self.G,self.L)]
             # self.coefficient = 1
-        elif switch_co == 'ism':
-            ism_dict = ismf.ism_res(self.G, self.A, len(self.A))
-            self.coefficient = [ism_dict['%d'%(node+1)] for node in self.G.nodes()]
-            co_max = max(self.coefficient)
-            self.coefficient = [1+a/co_max for a in self.coefficient]
-            # print(ism_list)
+
             
         elif switch_co == 'kshell':
             self.coefficient = dict()
@@ -231,12 +223,6 @@ class gravity_model():
             for node in self.G.nodes():
                 self.coefficient[node] =  1 + (self.coefficient[node] / NORM_BASE)
                 
-        elif switch_co == 'klayer':
-            self.coefficient = dict()
-            klayer_list = kl.k_layer(self.G)
-            MAX = max(list(klayer_list.values()))
-            for node in self.G:
-                self.coefficient[node] = 1 + (klayer_list[node] / MAX)
                 
         elif switch_co == 'rea':
             REA_MAT = tf.reachable_matrix(self.G)
