@@ -2,7 +2,7 @@
 Description: 调用gravity类的主函数
 Author: Junwen Yang
 Date: 2022-06-26 23:08:21
-LastEditTime: 2023-03-05 15:19:13
+LastEditTime: 2023-03-05 15:07:34
 LastEditors: Junwen Yang
 '''
 
@@ -54,8 +54,6 @@ class network_edgelist():
     bit = 'bitcoinalpha'
     ca = 'Cattle–cattle dominances'
     mo = 'moreno_health'
-    wiki = 'Wiki-Vote'
-    twir = 'twitterreferendum'
 
 
 
@@ -69,7 +67,10 @@ LastEditors: Junwen Yang
 
 def run(graph, file_name):
     # 为当前网络创建文件夹
-    
+    path = f"./{graph}"
+    if not os.path.exists(path):
+        os.mkdir(path)
+
     # 调用 graph_create 生成网络
     graph_class = gc.graph_create('./data/'+graph)
     G = graph_class.G
@@ -103,12 +104,12 @@ def run(graph, file_name):
 
 
     # 根据分数 dict 生成排名 list
-    df_rank = pd.DataFrame(rank_list, columns=methods)
+    df_rank = pd.DataFrame(rank_list, index=scores.keys(), columns=[])
     with pd.ExcelWriter(file_name[1], mode='a', engine="openpyxl") as writer:
         df_rank.to_excel(writer, sheet_name=graph)
 
     # 将计算时间写入 .xlsx 文件
-    time_df = pd.DataFrame({"Duration": list(durations.values())}, index=list(durations.keys()))
+    time_df = pd.DataFrame({"Duration": list(durations.values())})
     with pd.ExcelWriter(file_name[2], mode='a', engine="openpyxl") as writer:
         time_df.to_excel(writer, sheet_name=graph)
 
@@ -167,11 +168,11 @@ def main():
 
     # -----------------------------------------------------调节网络数量，调用run()进行计算-------------------------------------
     for graph_name in [
+        network_edgelist.s,
         network_edgelist.m,
-        network_edgelist.mo,
         network_edgelist.bit,
-        network_edgelist.wiki,
-        network_edgelist.twir
+        network_edgelist.ca,
+        network_edgelist.mo
         ]:
         print("\n========================================Running network "+graph_name+"========================================\n")
         run(graph_name, file_name_list)

@@ -2,7 +2,7 @@
 Description: 
 Author: Junwen Yang
 Date: 2022-07-12 09:39:17
-LastEditTime: 2023-03-05 11:52:50
+LastEditTime: 2023-03-05 15:18:40
 LastEditors: Junwen Yang
 '''
 
@@ -18,12 +18,12 @@ import tools_func as tf
 from alive_progress import alive_bar
 class gravity_model():
     
-    def __init__(self, A, G,switch_mass,switch_co,switch_dist):
+    def __init__(self, G, switch_mass, switch_co, switch_dist):
         self.A = np.array(nx.adjacency_matrix(G).todense())
         self.G = G
         # self.W = W
         # self.graph = graph
-        self.size = len(A)
+        self.size = len(self.A)
         # self.mass = dict()
         self.centrality = dict()
         self.run(switch_mass,switch_co,switch_dist)
@@ -148,12 +148,12 @@ class gravity_model():
             for node in self.G.nodes():
                 DICT_NEIGHBOR[node] = tf.neighbor_search(self.G, node, INT_AVER_DIST)
             print('Mass Calculation start...')
-            with alive_bar(len(self.G.nodes())) as bar:
-                for node in self.G.nodes():
-                    for i in range(INT_AVER_DIST):
-                        self.mass_source[node] += sum([self.G.out_degree(target)/(i+1) for target in DICT_NEIGHBOR[node][i]])
-                    self.mass_source[node] *= self.G.out_degree(node)
-                    bar()
+            # with alive_bar(len(self.G.nodes())) as bar:
+            for node in self.G.nodes():
+                for i in range(INT_AVER_DIST):
+                    self.mass_source[node] += sum([self.G.out_degree(target)/(i+1) for target in DICT_NEIGHBOR[node][i]])
+                self.mass_source[node] *= self.G.out_degree(node)
+                    # bar()
             # self.mass_source = [a/sum(self.mass_source.values()) for a in self.mass_source.values()]
             # self.mass_source = [math.exp(a) for a in self.mass_source]
             # for index,value in self.mass_source.items():
@@ -294,17 +294,17 @@ class gravity_model():
         # print('Neighbor search finished...')
         # print(DICT_NEIGHBOR[65])
         print('Score Calculation start...')
-        with alive_bar(len(self.G.nodes())) as bar:
-            for node in self.G.nodes():
-                for i in range(INT_AVER_DIST,AVER_DIST,1):
-                # for i in range(AVER_DIST):
-                    self.centrality[node] += sum([gravity_model.gravity_formula(self.mass_source[node], self.mass_target[target], i+1) for target in DICT_NEIGHBOR[node][i]])
-                    # if node == 65:
-                    #     print(self.mass_source[node])
-                # print(self.coefficient[node])
-                self.centrality[node] *= self.coefficient[node]
-                self.centrality[node] += self.G.out_degree(node) * self.coefficient[node]
-                bar()
+        # with alive_bar(len(self.G.nodes())) as bar:
+        for node in self.G.nodes():
+            for i in range(INT_AVER_DIST,AVER_DIST,1):
+            # for i in range(AVER_DIST):
+                self.centrality[node] += sum([gravity_model.gravity_formula(self.mass_source[node], self.mass_target[target], i+1) for target in DICT_NEIGHBOR[node][i]])
+                # if node == 65:
+                #     print(self.mass_source[node])
+            # print(self.coefficient[node])
+            self.centrality[node] *= self.coefficient[node]
+            self.centrality[node] += self.G.out_degree(node) * self.coefficient[node]
+                # bar()
             
     def run(self,switch_mass,switch_co,switch_dist):
         # print("\n---------正在计算节点质量---------\n")

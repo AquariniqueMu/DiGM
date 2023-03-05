@@ -2,7 +2,7 @@
 Author: AquarniqueMu 237795826@qq.com
 Date: 2022-07-12 09:31:23
 LastEditors: Junwen Yang
-LastEditTime: 2023-02-09 19:16:20
+LastEditTime: 2023-03-05 15:17:46
 Description: 
 '''
 import numpy as np
@@ -21,9 +21,7 @@ class graph_create():
         
     def create(self):
         graph = self.graph
-        path = "./"+graph
-        if not os.path.exists(path):
-            os.mkdir(path)
+        
 
         G1= nx.read_weighted_edgelist(self.graph+".edgelist",create_using=nx.DiGraph)
         # if 0 not in G1.nodes():
