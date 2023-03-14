@@ -2,7 +2,7 @@
 Description: 用于生成SIR模型的标准中心性序列
 Author: Junwen Yang
 Date: 2023-03-04 20:39:27
-LastEditTime: 2023-03-05 13:37:09
+LastEditTime: 2023-03-14 15:11:30
 LastEditors: Junwen Yang
 '''
 import networkx as nx
@@ -85,41 +85,48 @@ def SIR_average(G, infected_nodes, beta, gamma, max_time, num_simulations):
     return avg_results
 
 directed_network_list = [
-    'MesselShale_foodweb',
-    'bitcoinalpha'
+    # 'MesselShale_foodweb',
+    # 'email-Eu-core',
+    # 'bitcoinalpha',
     # 'moreno_health',
-    # 'Wiki-Vote',
-    # 'twitterreferendum'
+    'Wiki-Vote',
+    'twitterreferendum'
     ]
 
 beta_ = 0.2
 gamma_ = 0.2
-max_time_ = 400
-num_simulations_ = 1
+max_time_ = 20
+num_simulations_ = 20
 
-now = datetime.datetime.now()
-date_string = now.strftime('%m-%d_%H-%M')
-filepath = './results/SIR_standard/'
-filename = 'standard_series_directed_'+date_string+'.xlsx'
-empty_df = pd.DataFrame()
-empty_df.to_excel(filepath+filename)
+# now = datetime.datetime.now()
+# date_string = now.strftime('%m-%d_%H-%M')
 
-for net in directed_network_list:
-    G = nx.read_weighted_edgelist('./data/'+net+'.edgelist', nodetype=int,create_using=nx.DiGraph)
+for beta_ in [0.1]:
+    gamma_ = beta_
+    filepath = './results/SIR_standard/'
+    filename = 'standard_series_directed_'+str(beta_)+'-'+str(gamma_)+'-20steps.xlsx'
+    # empty_df = pd.DataFrame()
+    # empty_df.to_excel(filepath+filename)
+
+    print('\n Simulation Start: beta = '+str(beta_)+' gamma = '+str(gamma_)+' max_time = '+str(max_time_)+' num_simulations = '+str(num_simulations_))
     
-    res = dict()
-    with alive_bar(G.number_of_nodes()) as bar:
-        for node in G.nodes():
-            res_dict = SIR_average(G, infected_nodes=[node], beta = beta_, gamma = gamma_, max_time = max_time_, num_simulations = num_simulations_)
-            res[node] = (res_dict['I'] + res_dict['R']) / G.number_of_nodes()
-            bar()
-    # Convert res dictionary to dataframe
-    df_res = pd.DataFrame.from_dict(res, orient='index', columns=['Infection Ratio'])
+    for net in directed_network_list:
+        print('\n---------------------------------------------------------------------------------------------------------------')
+        G = nx.read_weighted_edgelist('./data/'+net+'.edgelist', nodetype=int,create_using=nx.DiGraph)
+        
+        res = dict()
+        with alive_bar(G.number_of_nodes(), bar='blocks',title='SIR Simulation / '+net+' ---> ') as bar:
+            for node in G.nodes():
+                res_dict = SIR_average(G, infected_nodes=[node], beta = beta_, gamma = gamma_, max_time = max_time_, num_simulations = num_simulations_)
+                res[node] = (res_dict['I'] + res_dict['R'])
+                bar()
+        # Convert res dictionary to dataframe
+        df_res = pd.DataFrame.from_dict(res, orient='index', columns=['Infection Ratio'])
 
-    # Save dataframe to Excel file
-    with pd.ExcelWriter(filepath+filename, mode='a', engine="openpyxl") as writer:
-        df_res.to_excel(writer, sheet_name=net)
+        # Save dataframe to Excel file
+        with pd.ExcelWriter(filepath+filename, mode='a', engine="openpyxl") as writer:
+            df_res.to_excel(writer, sheet_name=net)
+        print('---------------------------------------------------------------------------------------------------------------')
+    
 
-    res = dict(sorted(res.items(), key=lambda x: x[1], reverse=True))
-    print(res)
 

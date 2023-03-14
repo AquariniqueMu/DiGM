@@ -2,7 +2,7 @@
 Description: 调用gravity类的主函数
 Author: Junwen Yang
 Date: 2022-06-26 23:08:21
-LastEditTime: 2023-03-05 15:19:13
+LastEditTime: 2023-03-05 16:46:28
 LastEditors: Junwen Yang
 '''
 
@@ -56,6 +56,7 @@ class network_edgelist():
     mo = 'moreno_health'
     wiki = 'Wiki-Vote'
     twir = 'twitterreferendum'
+    email = 'email-Eu-core'
 
 
 
@@ -167,11 +168,12 @@ def main():
 
     # -----------------------------------------------------调节网络数量，调用run()进行计算-------------------------------------
     for graph_name in [
-        network_edgelist.m,
-        network_edgelist.mo,
-        network_edgelist.bit,
-        network_edgelist.wiki,
-        network_edgelist.twir
+        # network_edgelist.m,
+        # network_edgelist.mo,
+        # network_edgelist.bit,
+        # network_edgelist.wiki,
+        # network_edgelist.twir,
+        network_edgelist.email
         ]:
         print("\n========================================Running network "+graph_name+"========================================\n")
         run(graph_name, file_name_list)

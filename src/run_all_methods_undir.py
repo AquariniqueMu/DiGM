@@ -54,6 +54,10 @@ class network_edgelist():
     bit = 'bitcoinalpha'
     ca = 'Cattle–cattle dominances'
     mo = 'moreno_health'
+    wiki = 'Wiki-Vote'
+    twir = 'twitterreferendum'
+    email = 'email-Eu-core'
+    
 
 
 

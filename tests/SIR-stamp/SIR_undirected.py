@@ -2,7 +2,7 @@
 Description: 用于生成SIR模型的标准中心性序列
 Author: Junwen Yang
 Date: 2023-03-04 20:39:27
-LastEditTime: 2023-03-05 14:29:45
+LastEditTime: 2023-03-05 13:05:20
 LastEditors: Junwen Yang
 '''
 import networkx as nx
@@ -86,10 +86,10 @@ def SIR_average(G, infected_nodes, beta, gamma, max_time, num_simulations):
 
 
 undirected_network_list = [
-    'MesselShale_foodweb',
-    'bitcoinalpha'
-    'moreno_health',
-    'Wiki-Vote',
+    # 'MesselShale_foodweb',
+    # 'bitcoinalpha',
+    # 'moreno_health',
+    # 'Wiki-Vote',
     'twitterreferendum'
     ]
 
